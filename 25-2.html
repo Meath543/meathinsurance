@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>巴菲特 25-5 聚焦法則</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        h1, h2, h3 {
+            color: var(--text-main);
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 輸入框與表單設計 */
+        .grid-25 {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* 選擇卡片設計 */
+        .select-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .goal-card {
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .goal-card:hover {
+            border-color: var(--primary);
+        }
+
+        .goal-card.selected {
+            background-color: rgba(37, 99, 235, 0.05);
+            border-color: var(--primary);
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .goal-card input[type="checkbox"] {
+            pointer-events: none;
+        }
+
+        /* 排序列表設計 */
+        .sort-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 30px;
+        }
+
+        .sort-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .sort-actions button {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 5px 10px;
+        }
+        
+        .sort-actions button:hover {
+            color: var(--primary);
+        }
+
+        /* 行動計畫設計 */
+        .plan-item {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        
+        .plan-item h3 {
+            text-align: left;
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        /* 按鈕設計 */
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button.btn {
+            padding: 12px 24px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        button.btn:hover { background-color: var(--primary-hover); }
+        button.btn:disabled { background-color: #cbd5e1; cursor: not-allowed; }
+        button.btn-secondary { background-color: white; color: var(--text-main); border: 1px solid var(--border-color); }
+        button.btn-secondary:hover { background-color: var(--bg-color); }
+
+        /* 列印版面設計 */
+        .print-area { display: none; }
+        
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; padding: 0; }
+            .no-print { display: none !important; }
+            .print-area { display: block; }
+            
+            .final-report {
+                page-break-inside: avoid;
+            }
+            .top-5-box {
+                border: 2px solid var(--text-main);
+                padding: 20px;
+                border-radius: 12px;
+                margin-bottom: 30px;
+            }
+            .avoid-box {
+                border: 2px dashed var(--text-muted);
+                padding: 20px;
+                border-radius: 12px;
+                background-color: #f8fafc !important;
+                -webkit-print-color-adjust: exact;
+            }
+            .avoid-box h3 { color: var(--danger); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="no-print">
+        <h1>巴菲特 25-5 聚焦法則</h1>
+        <p class="subtitle" id="step-indicator">步驟 1 / 5：發散與記錄</p>
+    </div>
+
+    <!-- Step 1: Write 25 Goals -->
+    <div id="step1" class="step active no-print">
+        <h2>寫下你目前最想完成的目標</h2>
+        <p class="subtitle">不要思考限制，寫下你近期或人生中最想完成的 25 件事。（至少需填寫 5 項）</p>
+        <div class="grid-25" id="inputs-container"></div>
+        <div class="btn-group">
+            <button class="btn" onclick="goToStep2()">下一步：圈選最重要的 5 個</button>
+        </div>
+    </div>
+
+    <!-- Step 2: Select Top 5 -->
+    <div id="step2" class="step no-print">
+        <h2>從中圈出「最重要」的 5 個</h2>
+        <p class="subtitle">這一步最艱難。請仔細思考，只能選擇 5 個。已選：<span id="selected-count" style="color:var(--primary); font-weight:bold;">0</span> / 5</p>
+        <div class="select-grid" id="selection-container"></div>
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="backToStep(1)">上一步</button>
+            <button class="btn" id="btn-step2" onclick="goToStep3()" disabled>下一步：排列優先順序</button>
+        </div>
+    </div>
+
+    <!-- Step 3: Prioritize Top 5 -->
+    <div id="step3" class="step no-print">
+        <h2>將這 5 個目標排列優先順序</h2>
+        <p class="subtitle">使用上下按鈕，將最重要的排在最上方。</p>
+        <ul class="sort-list" id="sort-container"></ul>
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="backToStep(2)">上一步</button>
+            <button class="btn" onclick="goToStep4()">下一步：制定行動計畫</button>
+        </div>
+    </div>
+
+    <!-- Step 4: Action Plan -->
+    <div id="step4" class="step no-print">
+        <h2>為前 5 項安排具體行動與時間</h2>
+        <p class="subtitle">寫下達成這 5 個目標的第一步或關鍵行動，以及預計完成的期限。</p>
+        <div id="plan-container"></div>
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="backToStep(3)">上一步</button>
+            <button class="btn" onclick="goToStep5()">完成並產生報表</button>
+        </div>
+    </div>
+
+    <!-- Step 5: Final Result (Printable) -->
+    <div id="step5" class="step print-area">
+        <h1 style="margin-bottom: 5px;">我的聚焦清單</h1>
+        <p class="subtitle no-print">請將此頁面列印或存成 PDF，貼在你每天都看得到的地方。</p>
+        
+        <div class="final-report">
+            <div class="top-5-box">
+                <h2 style="margin-top:0;">🌟 絕對專注的 Top 5</h2>
+                <div id="final-top5"></div>
+            </div>
+
+            <div class="avoid-box">
+                <h3 style="margin-top:0;">⛔ 避免清單 (Avoid-At-All-Cost)</h3>
+                <p style="font-size: 14px; color: var(--text-muted);">警告：在 Top 5 尚未完成或達到階段性成果之前，絕對不要在以下項目投入任何主要時間與精力。</p>
+                <ul id="final-avoid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; color: var(--text-muted);"></ul>
+            </div>
+        </div>
+
+        <div class="btn-group no-print">
+            <button class="btn btn-secondary" onclick="backToStep(4)">修改計畫</button>
+            <button class="btn" onclick="window.print()">🖨️ 列印 / 儲存為 PDF</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 狀態管理
+    let allGoals = [];
+    let selectedIndices = [];
+    let top5Goals = []; // 排序後的 Top 5
+
+    // 初始化 Step 1 的 25 個輸入框
+    const inputsContainer = document.getElementById('inputs-container');
+    for (let i = 1; i <= 25; i++) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = `目標 ${i}`;
+        input.id = `goal-input-${i}`;
+        inputsContainer.appendChild(input);
+    }
+
+    // 更新步驟標題
+    function updateStepIndicator(step) {
+        const titles = ['發散與記錄', '挑選核心', '優先級排序', '行動計畫', '聚焦清單'];
+        document.getElementById('step-indicator').innerText = `步驟 ${step} / 5：${titles[step-1]}`;
+    }
+
+    function switchStep(from, to) {
+        document.getElementById(`step${from}`).classList.remove('active');
+        document.getElementById(`step${to}`).classList.add('active');
+        updateStepIndicator(to);
+        window.scrollTo(0, 0);
+    }
+
+    function backToStep(step) {
+        const current = step + 1;
+        switchStep(current, step);
+    }
+
+    // 前往 Step 2
+    function goToStep2() {
+        allGoals = [];
+        for (let i = 1; i <= 25; i++) {
+            const val = document.getElementById(`goal-input-${i}`).value.trim();
+            if (val) allGoals.push(val);
+        }
+
+        if (allGoals.length < 5) {
+            alert('請至少填寫 5 個目標才能進行篩選。');
+            return;
+        }
+
+        // 渲染 Step 2 選擇畫面
+        const container = document.getElementById('selection-container');
+        container.innerHTML = '';
+        selectedIndices = [];
+        updateSelectCount();
+
+        allGoals.forEach((goal, index) => {
+            const card = document.createElement('div');
+            card.className = 'goal-card';
+            card.innerHTML = `
+                <input type="checkbox" id="check-${index}">
+                <label style="cursor:pointer; width:100%;">${goal}</label>
+            `;
+            
+            card.onclick = () => {
+                const checkbox = card.querySelector('input');
+                if (!checkbox.checked && selectedIndices.length >= 5) return; // 限制只能選 5 個
+                
+                checkbox.checked = !checkbox.checked;
+                if (checkbox.checked) {
+                    card.classList.add('selected');
+                    selectedIndices.push(index);
+                } else {
+                    card.classList.remove('selected');
+                    selectedIndices = selectedIndices.filter(i => i !== index);
+                }
+                updateSelectCount();
+            };
+            container.appendChild(card);
+        });
+
+        switchStep(1, 2);
+    }
+
+    function updateSelectCount() {
+        document.getElementById('selected-count').innerText = selectedIndices.length;
+        document.getElementById('btn-step2').disabled = selectedIndices.length !== 5;
+        
+        // 如果已經選滿 5 個，降低其他卡片的透明度
+        const cards = document.querySelectorAll('.goal-card');
+        cards.forEach((card, index) => {
+            if (selectedIndices.length >= 5 && !selectedIndices.includes(index)) {
+                card.style.opacity = '0.5';
+            } else {
+                card.style.opacity = '1';
+            }
+        });
+    }
+
+    // 前往 Step 3
+    function goToStep3() {
+        // 抓取選中的 5 個目標
+        top5Goals = selectedIndices.map(index => allGoals[index]);
+        renderSortList();
+        switchStep(2, 3);
+    }
+
+    function renderSortList() {
+        const container = document.getElementById('sort-container');
+        container.innerHTML = '';
+        top5Goals.forEach((goal, index) => {
+            const li = document.createElement('li');
+            li.className = 'sort-item';
+            li.innerHTML = `
+                <div style="font-weight: 500;">
+                    <span style="color:var(--primary); margin-right:10px;">#${index + 1}</span> 
+                    ${goal}
+                </div>
+                <div class="sort-actions">
+                    <button onclick="moveItem(${index}, -1)" ${index === 0 ? 'disabled style="opacity:0.2"' : ''}>▲</button>
+                    <button onclick="moveItem(${index}, 1)" ${index === top5Goals.length - 1 ? 'disabled style="opacity:0.2"' : ''}>▼</button>
+                </div>
+            `;
+            container.appendChild(li);
+        });
+    }
+
+    function moveItem(index, direction) {
+        const newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= top5Goals.length) return;
+        
+        // 交換陣列元素
+        const temp = top5Goals[index];
+        top5Goals[index] = top5Goals[newIndex];
+        top5Goals[newIndex] = temp;
+        
+        renderSortList();
+    }
+
+    // 前往 Step 4
+    function goToStep4() {
+        const container = document.getElementById('plan-container');
+        container.innerHTML = '';
+        
+        top5Goals.forEach((goal, index) => {
+            const div = document.createElement('div');
+            div.className = 'plan-item';
+            div.innerHTML = `
+                <h3>#${index + 1} ${goal}</h3>
+                <div style="margin-bottom: 10px;">
+                    <label style="display:block; font-size:14px; margin-bottom:5px;">具體行動：</label>
+                    <input type="text" id="action-${index}" placeholder="例如：每天下班後花一小時學習 / 預約諮詢..." required>
+                </div>
+                <div>
+                    <label style="display:block; font-size:14px; margin-bottom:5px;">期限 / 頻率：</label>
+                    <input type="text" id="time-${index}" placeholder="例如：2026年底前 / 每週三晚上" required>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        
+        switchStep(3, 4);
+    }
+
+    // 前往 Step 5 (最終報表)
+    function goToStep5() {
+        const top5Container = document.getElementById('final-top5');
+        top5Container.innerHTML = '';
+        
+        // 渲染 Top 5 及計畫
+        top5Goals.forEach((goal, index) => {
+            const action = document.getElementById(`action-${index}`).value || '尚未填寫行動';
+            const time = document.getElementById(`time-${index}`).value || '尚未填寫期限';
+            
+            const div = document.createElement('div');
+            div.style.marginBottom = '20px';
+            div.innerHTML = `
+                <div style="font-size: 18px; font-weight: bold; color: var(--text-main);">
+                    ${index + 1}. ${goal}
+                </div>
+                <div style="font-size: 14px; color: #475569; margin-top: 5px; padding-left: 20px; border-left: 3px solid var(--primary);">
+                    <strong>行動：</strong>${action} <br>
+                    <strong>時間：</strong>${time}
+                </div>
+            `;
+            top5Container.appendChild(div);
+        });
+
+        // 渲染 Avoid-At-All-Cost 清單 (其餘未入選的目標)
+        const avoidContainer = document.getElementById('final-avoid');
+        avoidContainer.innerHTML = '';
+        
+        const avoidGoals = allGoals.filter(goal => !top5Goals.includes(goal));
+        avoidGoals.forEach(goal => {
+            const li = document.createElement('li');
+            li.style.marginBottom = '5px';
+            li.innerText = goal;
+            avoidContainer.appendChild(li);
+        });
+
+        switchStep(4, 5);
+    }
+</script>
+
+</body>
+</html>
